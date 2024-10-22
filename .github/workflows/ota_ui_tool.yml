@@ -62,7 +62,7 @@ jobs:
                   upx=True,
                   console=False,
                   disable_windowed_traceback=False,
-                  target_arch=None,
+                  target_arch='${{ matrix.arch }}',
                   codesign_identity=None,
                   entitlements_file=None , icon='config/ota.ico')
 
@@ -80,11 +80,7 @@ jobs:
       env:
         ARCHFLAGS: "-arch ${{ matrix.arch }}"
       run: |
-        if [ "${{ matrix.arch }}" = "universal2" ]; then
-          pyinstaller --clean --target-architecture universal2 hid_tota_ota.spec
-        else
-          pyinstaller --clean hid_tota_ota.spec
-        fi
+        pyinstaller --clean hid_tota_ota.spec
     
     - name: 压缩构建产物
       run: |

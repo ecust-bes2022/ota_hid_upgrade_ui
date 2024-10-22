@@ -23,10 +23,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
-    
+        brew install upx
+
     - name: 使用 PyInstaller 构建
       run: |
-        pyinstaller -D -i ./config/ota.ico hid_tota_ota.py
+        pyinstaller -D -i ./config/ota.ico \
+          --exclude-module QtQml \
+          --exclude-module QtQuick \
+          --exclude-module QtVirtualKeyboard \
+          --exclude-module QtPdf \
+          --exclude-module QtOpenGL \
+          --exclude-module QtNetwork \
+          --exclude-module QtDBus \
+          --upx-dir=$(brew --prefix upx)/bin \
+          hid_tota_ota.py
         cp -R ./config ./dist/hid_tota_ota/
     
     - name: 压缩构建产物

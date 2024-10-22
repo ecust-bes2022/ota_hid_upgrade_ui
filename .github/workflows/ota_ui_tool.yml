@@ -25,10 +25,17 @@ jobs:
         pip install pyinstaller
     
     - name: 使用 PyInstaller 构建
-      run: pyinstaller -F -i ./config/ota.ico hid_tota_ota.py
+      run: |
+        pyinstaller -D -i ./config/ota.ico hid_tota_ota.py
+        cp -R ./config ./dist/hid_tota_ota/
+    
+    - name: 压缩构建产物
+      run: |
+        cd dist
+        zip -r hid_tota_ota.zip hid_tota_ota
     
     - name: 上传构建产物
       uses: actions/upload-artifact@v3
       with:
         name: hid_tota_ota
-        path: dist/hid_tota_ota
+        path: dist/hid_tota_ota.zip

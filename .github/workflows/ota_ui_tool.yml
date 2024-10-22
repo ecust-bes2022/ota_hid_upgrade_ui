@@ -1,4 +1,4 @@
-name: 构建应用程序
+name: 构建 macOS 应用程序
 
 on:
   push:
@@ -8,6 +8,9 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        arch: [x86_64, arm64, universal2]
     runs-on: macos-latest
     
     steps:
@@ -74,16 +77,22 @@ jobs:
         EOF
 
     - name: 使用 PyInstaller 构建
+      env:
+        ARCHFLAGS: "-arch ${{ matrix.arch }}"
       run: |
-        pyinstaller --clean hid_tota_ota.spec
+        if [ "${{ matrix.arch }}" = "universal2" ]; then
+          pyinstaller --clean --target-architecture universal2 hid_tota_ota.spec
+        else
+          pyinstaller --clean hid_tota_ota.spec
+        fi
     
     - name: 压缩构建产物
       run: |
         cd dist
-        zip -r hid_tota_ota.zip hid_tota_ota
-    
+        zip -r hid_tota_ota_${{ matrix.arch }}.zip hid_tota_ota
+
     - name: 上传构建产物
       uses: actions/upload-artifact@v3
       with:
-        name: hid_tota_ota
-        path: dist/hid_tota_ota.zip
+        name: hid_tota_ota_${{ matrix.arch }}
+        path: dist/hid_tota_ota_${{ matrix.arch }}.zip

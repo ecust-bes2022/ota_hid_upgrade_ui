@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        arch: [x86_64, arm64, universal2]
+        arch: [x86_64, arm64]
     runs-on: macos-latest
     
     steps:
@@ -20,6 +20,7 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
+        architecture: ${{ matrix.arch }}
     
     - name: 安装依赖
       run: |
@@ -62,7 +63,6 @@ jobs:
                   upx=True,
                   console=False,
                   disable_windowed_traceback=False,
-                  target_arch='${{ matrix.arch }}',
                   codesign_identity=None,
                   entitlements_file=None , icon='config/ota.ico')
 
@@ -77,8 +77,6 @@ jobs:
         EOF
 
     - name: 使用 PyInstaller 构建
-      env:
-        ARCHFLAGS: "-arch ${{ matrix.arch }}"
       run: |
         pyinstaller --clean hid_tota_ota.spec
     
@@ -92,3 +90,27 @@ jobs:
       with:
         name: hid_tota_ota_${{ matrix.arch }}
         path: dist/hid_tota_ota_${{ matrix.arch }}.zip
+
+  create-universal2:
+    needs: [build]
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v3
+    
+    - name: 创建 Universal2 二进制
+      run: |
+        mkdir universal2
+        unzip hid_tota_ota_x86_64/hid_tota_ota_x86_64.zip -d universal2/x86_64
+        unzip hid_tota_ota_arm64/hid_tota_ota_arm64.zip -d universal2/arm64
+        lipo universal2/x86_64/hid_tota_ota/hid_tota_ota universal2/arm64/hid_tota_ota/hid_tota_ota -create -output universal2/hid_tota_ota
+        cp -R universal2/arm64/hid_tota_ota/* universal2/
+        rm -rf universal2/x86_64 universal2/arm64
+        cd universal2
+        zip -r ../hid_tota_ota_universal2.zip .
+    
+    - name: 上传 Universal2 构建产物
+      uses: actions/upload-artifact@v3
+      with:
+        name: hid_tota_ota_universal2
+        path: hid_tota_ota_universal2.zip

@@ -1,0 +1,32 @@
+QTimeEdit {
+    min-height: 25px;
+    min-width: 60px;
+    border-radius:5px;
+    background-color: lightblue;
+	border: none;
+}
+QProgressBar
+{
+    min-height :30px;
+	border:1px solid #6272a4;
+	background-color: rgb(98,114,164);
+    border-style: none;
+    border-radius: 5px;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+	
+    border-radius: 5px;
+    background-color: qlineargradient(spread:pad, x1:0, y1:0.511364, x2:1, y2:0.523, stop:0 rgba(254, 121, 199, 255), stop:1 rgba(170, 85, 255, 255));
+}
+QProgressBar:hover {
+
+	background-color: #654ea3; /* fallback for older Qt versions or if gradients fail */
+    background: qlineargradient(
+    x1:0, y1:0, x2:1, y2:0, 
+    stop:0 #eaafc8, /* start color */
+    stop:1 #654ea3  /* end color */
+);
+
+}

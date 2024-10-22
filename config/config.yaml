@@ -1,0 +1,9 @@
+HID_CONFIG:
+  hid_ota_bin_path: /Users/jerry_hu/Desktop/bes_tool/usb_ota_macos_by_clion/binfile/dongle_20240711_bcee616.bin
+  hid_ota_device_pid: 86C
+  hid_ota_device_vid: 45E
+  hid_ota_log_path: /Users/jerry_hu/Desktop/clion/log
+  hid_ota_log_switch: false
+  hid_ota_log_switch_enable: true
+  hid_ota_packet_interval: '0'
+  hid_ota_work_interval: '0'

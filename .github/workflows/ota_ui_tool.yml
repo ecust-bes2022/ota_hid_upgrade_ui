@@ -11,10 +11,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: x86_64
-            runs-on: macos-latest
-          - arch: arm64
-            runs-on: macos-latest
+          - os: macos-latest
+            arch: x86_64
+            name: intel
+          - os: macos-latest
+            arch: arm64
+            name: apple_silicon
     runs-on: ${{ matrix.runs-on }}
     
     steps:

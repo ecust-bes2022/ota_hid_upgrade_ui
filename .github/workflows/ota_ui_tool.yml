@@ -17,7 +17,7 @@ jobs:
           - os: macos-latest
             arch: arm64
             name: apple_silicon
-    runs-on: ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.os }}
     
     steps:
     - uses: actions/checkout@v3

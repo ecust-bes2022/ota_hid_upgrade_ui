@@ -9,234 +9,10 @@ on:
 jobs:
   build-mac-intel:
     name: Build macOS Intel
-    runs-on: macos-latest
-    if: runner.arch == 'X64'  # 确保在 Intel 机器上运行
+    runs-on: macos-13
     steps:
     - uses: actions/checkout@v3
     - name: 设置 Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    - name: 安装依赖
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pyinstaller
-        brew install upx
-    - name: 创建 .spec 文件
-      run: |
-        cat << EOF > hid_tota_ota.spec
-        # -*- mode: python ; coding: utf-8 -*-
-
-        block_cipher = None
-
-        a = Analysis(['hid_tota_ota.py'],
-                     pathex=[],
-                     binaries=[],
-                     datas=[('config', 'config')],
-                     hiddenimports=[],
-                     hookspath=[],
-                     hooksconfig={},
-                     runtime_hooks=[],
-                     excludes=['QtQml', 'QtQuick', 'QtVirtualKeyboard', 'QtPdf', 'QtOpenGL', 'QtNetwork', 'QtDBus'],
-                     win_no_prefer_redirects=False,
-                     win_private_assemblies=False,
-                     cipher=block_cipher,
-                     noarchive=False)
-
-        pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
-
-        exe = EXE(pyz,
-                  a.scripts,
-                  [],
-                  exclude_binaries=True,
-                  name='hid_tota_ota',
-                  debug=False,
-                  bootloader_ignore_signals=False,
-                  strip=False,
-                  upx=True,
-                  console=False,
-                  disable_windowed_traceback=False,
-                  codesign_identity=None,
-                  entitlements_file=None , icon='config/ota.ico')
-
-        coll = COLLECT(exe,
-                       a.binaries,
-                       a.zipfiles,
-                       a.datas,
-                       strip=False,
-                       upx=True,
-                       upx_exclude=[],
-                       name='hid_tota_ota')
-        EOF
-    - name: 使用 PyInstaller 构建
-      run: |
-        pyinstaller --clean hid_tota_ota.spec
-    - name: 压缩构建产物
-      run: |
-        cd dist
-        zip -r hid_tota_ota_${{ matrix.arch }}.zip hid_tota_ota
-    - name: 上传构建产物
-      uses: actions/upload-artifact@v3
-      with:
-        name: hid_tota_ota_mac_intel
-        path: dist/hid_tota_ota.zip
-
-  build-mac-arm:
-    name: Build macOS ARM
-    runs-on: macos-latest-xlarge  # ARM 机器
-    steps:
-    - uses: actions/checkout@v3
-    - name: 设置 Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    - name: 安装依赖
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pyinstaller
-        brew install upx
-    - name: 创建 .spec 文件
-      run: |
-        cat << EOF > hid_tota_ota.spec
-        # -*- mode: python ; coding: utf-8 -*-
-
-        block_cipher = None
-
-        a = Analysis(['hid_tota_ota.py'],
-                     pathex=[],
-                     binaries=[],
-                     datas=[('config', 'config')],
-                     hiddenimports=[],
-                     hookspath=[],
-                     hooksconfig={},
-                     runtime_hooks=[],
-                     excludes=['QtQml', 'QtQuick', 'QtVirtualKeyboard', 'QtPdf', 'QtOpenGL', 'QtNetwork', 'QtDBus'],
-                     win_no_prefer_redirects=False,
-                     win_private_assemblies=False,
-                     cipher=block_cipher,
-                     noarchive=False)
-
-        pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
-
-        exe = EXE(pyz,
-                  a.scripts,
-                  [],
-                  exclude_binaries=True,
-                  name='hid_tota_ota',
-                  debug=False,
-                  bootloader_ignore_signals=False,
-                  strip=False,
-                  upx=True,
-                  console=False,
-                  disable_windowed_traceback=False,
-                  codesign_identity=None,
-                  entitlements_file=None , icon='config/ota.ico')
-
-        coll = COLLECT(exe,
-                       a.binaries,
-                       a.zipfiles,
-                       a.datas,
-                       strip=False,
-                       upx=True,
-                       upx_exclude=[],
-                       name='hid_tota_ota')
-        EOF
-    - name: 使用 PyInstaller 构建
-      run: |
-        pyinstaller --clean hid_tota_ota.spec
-    - name: 压缩构建产物
-      run: |
-        cd dist
-        zip -r hid_tota_ota_${{ matrix.arch }}.zip hid_tota_ota
-    - name: 上传构建产物
-      uses: actions/upload-artifact@v3
-      with:
-        name: hid_tota_ota_mac_arm
-        path: dist/hid_tota_ota.zip
-
-  build-windows-x86:
-    name: Build Windows x86
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: 设置 Python 3.10 (32位)
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-        architecture: 'x86'
-    - name: 安装依赖
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pyinstaller
-        brew install upx
-    - name: 创建 .spec 文件
-      run: |
-        cat << EOF > hid_tota_ota.spec
-        # -*- mode: python ; coding: utf-8 -*-
-
-        block_cipher = None
-
-        a = Analysis(['hid_tota_ota.py'],
-                     pathex=[],
-                     binaries=[],
-                     datas=[('config', 'config')],
-                     hiddenimports=[],
-                     hookspath=[],
-                     hooksconfig={},
-                     runtime_hooks=[],
-                     excludes=['QtQml', 'QtQuick', 'QtVirtualKeyboard', 'QtPdf', 'QtOpenGL', 'QtNetwork', 'QtDBus'],
-                     win_no_prefer_redirects=False,
-                     win_private_assemblies=False,
-                     cipher=block_cipher,
-                     noarchive=False)
-
-        pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
-
-        exe = EXE(pyz,
-                  a.scripts,
-                  [],
-                  exclude_binaries=True,
-                  name='hid_tota_ota',
-                  debug=False,
-                  bootloader_ignore_signals=False,
-                  strip=False,
-                  upx=True,
-                  console=False,
-                  disable_windowed_traceback=False,
-                  codesign_identity=None,
-                  entitlements_file=None , icon='config/ota.ico')
-
-        coll = COLLECT(exe,
-                       a.binaries,
-                       a.zipfiles,
-                       a.datas,
-                       strip=False,
-                       upx=True,
-                       upx_exclude=[],
-                       name='hid_tota_ota')
-        EOF
-    - name: 使用 PyInstaller 构建
-      run: |
-        pyinstaller --clean hid_tota_ota.spec
-    - name: 压缩构建产物
-      run: |
-        cd dist
-        zip -r hid_tota_ota_${{ matrix.arch }}.zip hid_tota_ota
-    - name: 上传构建产物
-      uses: actions/upload-artifact@v3
-      with:
-        name: hid_tota_ota_win32
-        path: dist/hid_tota_ota.zip
-
-  build-windows-x64:
-    name: Build Windows x64
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: 设置 Python 3.10 (64位)
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
@@ -299,9 +75,232 @@ jobs:
     - name: 压缩构建产物
       run: |
         cd dist
-        zip -r hid_tota_ota_${{ matrix.arch }}.zip hid_tota_ota
+        zip -r hid_tota_ota_mac_intel.zip hid_tota_ota
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v3
+      with:
+        name: hid_tota_ota_mac_intel
+        path: dist/hid_tota_ota_mac_intel.zip
+
+  build-mac-arm:
+    name: Build macOS ARM
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: 设置 Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        architecture: 'arm64'
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+        brew install upx
+    - name: 创建 .spec 文件
+      run: |
+        cat << EOF > hid_tota_ota.spec
+        # -*- mode: python ; coding: utf-8 -*-
+
+        block_cipher = None
+
+        a = Analysis(['hid_tota_ota.py'],
+                     pathex=[],
+                     binaries=[],
+                     datas=[('config', 'config')],
+                     hiddenimports=[],
+                     hookspath=[],
+                     hooksconfig={},
+                     runtime_hooks=[],
+                     excludes=['QtQml', 'QtQuick', 'QtVirtualKeyboard', 'QtPdf', 'QtOpenGL', 'QtNetwork', 'QtDBus'],
+                     win_no_prefer_redirects=False,
+                     win_private_assemblies=False,
+                     cipher=block_cipher,
+                     noarchive=False)
+
+        pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+        exe = EXE(pyz,
+                  a.scripts,
+                  [],
+                  exclude_binaries=True,
+                  name='hid_tota_ota',
+                  debug=False,
+                  bootloader_ignore_signals=False,
+                  strip=False,
+                  upx=True,
+                  console=False,
+                  disable_windowed_traceback=False,
+                  codesign_identity=None,
+                  entitlements_file=None , icon='config/ota.ico')
+
+        coll = COLLECT(exe,
+                       a.binaries,
+                       a.zipfiles,
+                       a.datas,
+                       strip=False,
+                       upx=True,
+                       upx_exclude=[],
+                       name='hid_tota_ota')
+        EOF
+    - name: 使用 PyInstaller 构建
+      run: |
+        pyinstaller --clean hid_tota_ota.spec
+    - name: 压缩构建产物
+      run: |
+        cd dist
+        zip -r hid_tota_ota_mac_arm.zip hid_tota_ota
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v3
+      with:
+        name: hid_tota_ota_mac_arm
+        path: dist/hid_tota_ota_mac_arm.zip
+
+  build-windows-x86:
+    name: Build Windows x86
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: 设置 Python 3.10 (32位)
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        architecture: 'x86'
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+    - name: 创建 .spec 文件
+      run: |
+        cat << EOF > hid_tota_ota.spec
+        # -*- mode: python ; coding: utf-8 -*-
+
+        block_cipher = None
+
+        a = Analysis(['hid_tota_ota.py'],
+                     pathex=[],
+                     binaries=[],
+                     datas=[('config', 'config')],
+                     hiddenimports=[],
+                     hookspath=[],
+                     hooksconfig={},
+                     runtime_hooks=[],
+                     excludes=['QtQml', 'QtQuick', 'QtVirtualKeyboard', 'QtPdf', 'QtOpenGL', 'QtNetwork', 'QtDBus'],
+                     win_no_prefer_redirects=False,
+                     win_private_assemblies=False,
+                     cipher=block_cipher,
+                     noarchive=False)
+
+        pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+        exe = EXE(pyz,
+                  a.scripts,
+                  [],
+                  exclude_binaries=True,
+                  name='hid_tota_ota',
+                  debug=False,
+                  bootloader_ignore_signals=False,
+                  strip=False,
+                  upx=True,
+                  console=False,
+                  disable_windowed_traceback=False,
+                  codesign_identity=None,
+                  entitlements_file=None , icon='config/ota.ico')
+
+        coll = COLLECT(exe,
+                       a.binaries,
+                       a.zipfiles,
+                       a.datas,
+                       strip=False,
+                       upx=True,
+                       upx_exclude=[],
+                       name='hid_tota_ota')
+        EOF
+    - name: 使用 PyInstaller 构建
+      run: |
+        pyinstaller --clean hid_tota_ota.spec
+    - name: 压缩构建产物
+      run: |
+        cd dist
+        Compress-Archive -Path hid_tota_ota -DestinationPath hid_tota_ota_win32.zip
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v3
+      with:
+        name: hid_tota_ota_win32
+        path: dist/hid_tota_ota_win32.zip
+
+  build-windows-x64:
+    name: Build Windows x64
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: 设置 Python 3.10 (64位)
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+    - name: 创建 .spec 文件
+      run: |
+        cat << EOF > hid_tota_ota.spec
+        # -*- mode: python ; coding: utf-8 -*-
+
+        block_cipher = None
+
+        a = Analysis(['hid_tota_ota.py'],
+                     pathex=[],
+                     binaries=[],
+                     datas=[('config', 'config')],
+                     hiddenimports=[],
+                     hookspath=[],
+                     hooksconfig={},
+                     runtime_hooks=[],
+                     excludes=['QtQml', 'QtQuick', 'QtVirtualKeyboard', 'QtPdf', 'QtOpenGL', 'QtNetwork', 'QtDBus'],
+                     win_no_prefer_redirects=False,
+                     win_private_assemblies=False,
+                     cipher=block_cipher,
+                     noarchive=False)
+
+        pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+        exe = EXE(pyz,
+                  a.scripts,
+                  [],
+                  exclude_binaries=True,
+                  name='hid_tota_ota',
+                  debug=False,
+                  bootloader_ignore_signals=False,
+                  strip=False,
+                  upx=True,
+                  console=False,
+                  disable_windowed_traceback=False,
+                  codesign_identity=None,
+                  entitlements_file=None , icon='config/ota.ico')
+
+        coll = COLLECT(exe,
+                       a.binaries,
+                       a.zipfiles,
+                       a.datas,
+                       strip=False,
+                       upx=True,
+                       upx_exclude=[],
+                       name='hid_tota_ota')
+        EOF
+    - name: 使用 PyInstaller 构建
+      run: |
+        pyinstaller --clean hid_tota_ota.spec
+    - name: 压缩构建产物
+      run: |
+        cd dist
+        Compress-Archive -Path hid_tota_ota -DestinationPath hid_tota_ota_win64.zip
     - name: 上传构建产物
       uses: actions/upload-artifact@v3
       with:
         name: hid_tota_ota_win64
-        path: dist/hid_tota_ota.zip
+        path: dist/hid_tota_ota_win64.zip

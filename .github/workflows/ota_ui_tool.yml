@@ -173,8 +173,10 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
     - name: 创建 .spec 文件
+      if: runner.os == 'Windows'
+      shell: pwsh
       run: |
-        cat << EOF > hid_tota_ota.spec
+        @'
         # -*- mode: python ; coding: utf-8 -*-
 
         block_cipher = None
@@ -217,7 +219,7 @@ jobs:
                        upx=True,
                        upx_exclude=[],
                        name='hid_tota_ota')
-        EOF
+'@ | Out-File -FilePath hid_tota_ota.spec -Encoding UTF8
     - name: 使用 PyInstaller 构建
       run: |
         pyinstaller --clean hid_tota_ota.spec
@@ -247,8 +249,10 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
     - name: 创建 .spec 文件
+      if: runner.os == 'Windows'
+      shell: pwsh
       run: |
-        cat << EOF > hid_tota_ota.spec
+        @'
         # -*- mode: python ; coding: utf-8 -*-
 
         block_cipher = None
@@ -291,7 +295,7 @@ jobs:
                        upx=True,
                        upx_exclude=[],
                        name='hid_tota_ota')
-        EOF
+'@ | Out-File -FilePath hid_tota_ota.spec -Encoding UTF8
     - name: 使用 PyInstaller 构建
       run: |
         pyinstaller --clean hid_tota_ota.spec

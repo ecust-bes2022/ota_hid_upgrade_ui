@@ -176,8 +176,7 @@ jobs:
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        $content = @"
-        # -*- mode: python ; coding: utf-8 -*-
+        echo "# -*- mode: python ; coding: utf-8 -*-
 
         block_cipher = None
 
@@ -218,9 +217,7 @@ jobs:
                        strip=False,
                        upx=True,
                        upx_exclude=[],
-                       name='hid_tota_ota')
-"@
-        $content | Set-Content -Path hid_tota_ota.spec
+                       name='hid_tota_ota')" | Out-File -FilePath hid_tota_ota.spec
     - name: 使用 PyInstaller 构建
       run: |
         pyinstaller --clean hid_tota_ota.spec
@@ -253,8 +250,7 @@ jobs:
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        $content = @"
-        # -*- mode: python ; coding: utf-8 -*-
+        echo "# -*- mode: python ; coding: utf-8 -*-
 
         block_cipher = None
 
@@ -295,9 +291,7 @@ jobs:
                        strip=False,
                        upx=True,
                        upx_exclude=[],
-                       name='hid_tota_ota')
-"@
-        $content | Set-Content -Path hid_tota_ota.spec
+                       name='hid_tota_ota')" | Out-File -FilePath hid_tota_ota.spec
     - name: 使用 PyInstaller 构建
       run: |
         pyinstaller --clean hid_tota_ota.spec
